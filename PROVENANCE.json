@@ -1,0 +1,64 @@
+{
+  "source": "https://github.com/InvisibleGuardian007/magpie-codex-guard",
+  "commit": "6bf81536773ceada52ec98dac1d18f9658f16c25",
+  "version": "0.1.0",
+  "license": "MIT",
+  "files": {
+    "package.json": {
+      "sha256": "431d7f0b2d0d45e644d873e568d83b70a65e8187bf66417f0576dab7bb8a42bd"
+    },
+    "index.mjs": {
+      "sha256": "30526b94064856f8ce59cda34292bc488c397a8c66ad2ea1fefc2e0003abaed0"
+    },
+    "lib/codex.mjs": {
+      "sha256": "329954ebe0871d68289ab94f578202f07d8f2a3ac8b0719091f2308537da9d9d"
+    },
+    "lib/quota.mjs": {
+      "sha256": "c487a17aa7978d99a1c54b35c195917d04e709e039c5730a9eeae91b5b3ec2cd"
+    },
+    "lib/routing.mjs": {
+      "sha256": "0a2f34bdd4a617fd03724232ac90d8b16f3a58717aa3d9e79747ffb791183f66"
+    },
+    "lib/server.mjs": {
+      "sha256": "d52c1024a360a176b011fc657534d9e64513327d7f24d687f3f5653da5f8e434"
+    },
+    "page/index.html": {
+      "sha256": "0ebd6f42fee7e0ea63f3560e167e27fc2991e9d772632a667ed9d9067475521d"
+    },
+    "page/boot.js": {
+      "sha256": "aa4467e793266cefa8e524003990b6a40cd62e087f0dd82b2258a4cd6853db5f"
+    },
+    "page/icon.svg": {
+      "sha256": "a33dc78aed7e117de203a48a0670b97dc282d431c6de62a75e45ac5acc4fbc57"
+    },
+    "ui/index.html": {
+      "sha256": "eec7bf874c56f821a143f27edacf1be009788413ffe4dc4c786fd578d7f76af8"
+    },
+    "ui/style.css": {
+      "sha256": "e4c54368230ddaf167819d593f7ae2eeb279bbc7539973cad4657cb07b9d6b00"
+    },
+    "ui/app.js": {
+      "sha256": "1339a3462fbce5130a2789c1d6ef42e10658282688a33c68477c258d4fb44603"
+    },
+    "test/codex.test.mjs": {
+      "sha256": "d6ca0ca4a50fa9d1bb984e0dee13a6c75a480b72abc8958d4998ec6dc731bbd6"
+    },
+    "test/server.test.mjs": {
+      "sha256": "7cfd372cd237f4127f3b1ba5088e4c6a2435f3c0577bde6ce5315ea0817a0078"
+    },
+    "test/page.test.mjs": {
+      "sha256": "7b89da0591c4d390a284968b7bea6d54508972328e1dbf1594e122652ee61d12"
+    },
+    "README.md": {
+      "sha256": "187686820d038e42cc74d3a4706cfb6d44940c5b400aac92c768d8d926744c29"
+    },
+    "LICENSE": {
+      "sha256": "b1a16a9353fff37af1353e77ba4b0a23460ca31ad8066bb08ff0b71f4483c2ca"
+    }
+  },
+  "changes": [
+    "First version. A page plus its host service; no gateway, provider or agent hook.",
+    "The host part reads .codex-global-state.json, state-backups/ and magpie's providers.json / plugins.json, and calls magpie's /v1/magpie/quotas; permissions stays empty because the page itself reads no magpie resource.",
+    "Restore keeps the replaced file in state-backups/pre-restore-<time> and refuses a snapshot that is itself a signed-out copy."
+  ]
+}
