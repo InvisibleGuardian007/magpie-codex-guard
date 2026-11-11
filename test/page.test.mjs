@@ -31,7 +31,7 @@ test("the page loads the bridge and no inline script", () => {
 
 test("the ui talks only to its own service", () => {
   const code = read("ui/app.js");
-  assert.ok(code.includes('"/api/state"'), "it calls the state route");
+  assert.ok(/["']\/api\/state["']/.test(code), "it calls the state route");
   assert.ok(!code.includes("http://"), "no absolute url");
   assert.ok(!code.includes("https://"), "no absolute url");
   const calls = [...code.matchAll(/fetch\(([^,)]+)/g)].map((m) => m[1].trim());

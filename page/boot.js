@@ -1,8 +1,8 @@
 (async () => {
   var DEFAULT_PORT = 4391;
   var words = {
-    en: { title: "Codex guard", connecting: "Connecting to the local service...", stopped: function (port) { return "The local service is not running (127.0.0.1:" + port + ")."; }, retry: "Retry" },
-    zh: { title: "Codex 守护", connecting: "正在连接本地服务...", stopped: function (port) { return "本地服务没有在运行（127.0.0.1:" + port + "）。"; }, retry: "重试" }
+    en: { title: "Session guard", connecting: "Connecting to the local service...", stopped: function (port) { return "The local service is not running (127.0.0.1:" + port + ")."; }, retry: "Retry" },
+    zh: { title: "会话守护", connecting: "正在连接本地服务...", stopped: function (port) { return "本地服务没有在运行（127.0.0.1:" + port + "）。"; }, retry: "重试" }
   };
 
   var port = DEFAULT_PORT;

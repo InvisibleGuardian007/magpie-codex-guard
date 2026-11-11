@@ -18,6 +18,9 @@ function healthy() {
   for (let i = 0; i < 35; i += 1) json["key" + i] = i;
   json["local-projects"] = { a: { name: "Monster-Girl" } };
   json["thread-project-assignments"] = { t1: "a" };
+  const atoms = {};
+  for (let i = 0; i < 120; i += 1) atoms["sidebar-project-expanded-v1-codex:" + i] = true;
+  json["electron-persisted-atom-state"] = atoms;
   return json;
 }
 
@@ -29,6 +32,14 @@ async function withServer(fn) {
   } finally {
     server.close();
   }
+}
+
+function post(server, route, input) {
+  return fetch("http://127.0.0.1:" + server.port + route, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-codex-guard-token": server.token },
+    body: JSON.stringify(input || {})
+  }).then((res) => res.json());
 }
 
 test("the health route answers without a token", async () => {
@@ -65,7 +76,7 @@ test("a foreign Host header is refused", async () => {
   });
 });
 
-test("state, snapshot and restore through the api", async () => {
+test("state, snapshot, plan, merge and full restore through the api", async () => {
   await withServer(async (server, dir) => {
     writeState(dir, healthy());
     const headers = { "x-codex-guard-token": server.token };
@@ -73,22 +84,29 @@ test("state, snapshot and restore through the api", async () => {
     assert.equal(state.codex.mode, "healthy");
     assert.equal(state.quota.ok, false, "a dead gateway is reported, not thrown");
 
-    const made = await (await fetch("http://127.0.0.1:" + server.port + "/api/snapshot", {
-      method: "POST",
-      headers: Object.assign({ "content-type": "application/json" }, headers),
-      body: JSON.stringify({ name: "good" })
-    })).json();
+    const made = await post(server, "/api/snapshot", { name: "good" });
     assert.equal(made.ok, true);
-    assert.equal(made.snapshot.topKeys, made.snapshot.topKeys);
 
     writeState(dir, { a: 1, b: 2 });
-    const restored = await (await fetch("http://127.0.0.1:" + server.port + "/api/restore", {
-      method: "POST",
-      headers: Object.assign({ "content-type": "application/json" }, headers),
-      body: JSON.stringify({ name: "good" })
-    })).json();
+    const plan = await post(server, "/api/plan", { name: "good" });
+    assert.equal(plan.ok, true);
+    assert.ok(plan.plan.adds.includes("local-projects"));
+    assert.equal(plan.plan.kept, 2, "the plan counts the settings a merge leaves alone");
+
+    const merged = await post(server, "/api/restore", { name: "good", mode: "merge" });
+    assert.equal(merged.ok, true);
+    assert.equal(merged.restored.mode, "merge");
+    assert.equal(merged.state.codex.projectCount, 1);
+    const after = JSON.parse(fs.readFileSync(path.join(dir, ".codex-global-state.json"), "utf8"));
+    assert.equal(after.a, 1, "a merge keeps the settings it does not own");
+    assert.equal(after.b, 2);
+
+    writeState(dir, { a: 1, b: 2 });
+    const restored = await post(server, "/api/restore", { name: "good", mode: "full" });
     assert.equal(restored.ok, true);
     assert.equal(restored.state.codex.mode, "healthy");
+    const replaced = JSON.parse(fs.readFileSync(path.join(dir, ".codex-global-state.json"), "utf8"));
+    assert.equal(replaced.a, undefined, "a full restore replaces the file");
   });
 });
 

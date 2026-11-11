@@ -4,64 +4,160 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="codex-guard-token" content="__CODEX_GUARD_TOKEN__">
-  <title>Codex 守护</title>
+  <title>会话守护 Session Guard</title>
   <link rel="stylesheet" href="/ui/style.css">
 </head>
 <body>
-  <header class="bar">
-    <div class="brand">
-      <span class="mark" aria-hidden="true"></span>
-      <div>
-        <h1 data-i18n="title">Codex 守护</h1>
-        <p class="sub" data-i18n="subtitle">检查 Codex 的账号态文件，快照它，登出后把它恢复回来。</p>
+<div class="page">
+
+  <header class="hero">
+    <div class="hero-text">
+      <div class="hero-top">
+        <span id="badge" class="badge">读取中</span>
+        <span id="heroHint" class="hint"></span>
+      </div>
+      <h1><span data-i18n="title">会话守护</span><span class="wordmark" id="wordmark">Session Guard</span></h1>
+      <p class="sub" data-i18n="subtitle">盯住 Codex 的登录态文件：被登出清空时一键还原项目与会话归属，并看住 5 小时 / 7 天额度。</p>
+      <div class="pills" id="pills"></div>
+      <div class="hero-actions">
+        <button id="heroRestore" type="button" class="primary" data-i18n="heroRestore" hidden>立即还原登录态</button>
+        <button id="refresh" type="button" class="ghost" data-i18n="refresh">刷新</button>
+        <button id="quickSnap" type="button" class="ghost" data-i18n="quickSnap">立刻快照</button>
       </div>
     </div>
-    <div class="bar-right">
-      <span id="badge" class="badge">读取中</span>
-      <button id="refresh" type="button" class="ghost" data-i18n="refresh">刷新</button>
+    <div class="hero-art" aria-hidden="true">
+      <svg viewBox="0 0 240 200">
+        <defs>
+          <linearGradient id="hg" x1="30" y1="20" x2="150" y2="170" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#5b93ff"/><stop offset="1" stop-color="#1fc9b6"/>
+          </linearGradient>
+          <linearGradient id="hl" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ffffff" stop-opacity="0.5"/>
+            <stop offset="1" stop-color="#ffffff" stop-opacity="0.08"/>
+          </linearGradient>
+        </defs>
+        <circle cx="120" cy="102" r="82" fill="url(#hl)" opacity="0.32"/>
+        <circle cx="120" cy="102" r="62" fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="1.5" stroke-dasharray="4 7"/>
+        <path d="M120 38l40 15v35c0 24-17 42-40 49-23-7-40-25-40-49V53z" fill="url(#hg)"/>
+        <path d="M120 38l40 15v35c0 24-17 42-40 49-23-7-40-25-40-49V53z" fill="none" stroke="#ffffff" stroke-opacity="0.5" stroke-width="2.5"/>
+        <path d="M102 92l13 13 25-27" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
     </div>
   </header>
 
-  <main>
-    <section class="card" id="card-state">
-      <h2 data-i18n="stateTitle">登录态</h2>
-      <p id="stateNote" class="note"></p>
-      <dl id="stateList" class="kv"></dl>
-    </section>
-
-    <section class="card" id="card-snapshots">
-      <h2 data-i18n="snapTitle">快照与恢复</h2>
-      <p class="note" data-i18n="snapNote">恢复会先把当前文件存进 pre-restore，再写回所选快照。</p>
-      <div class="row">
-        <select id="snapPick" aria-label="snapshot"></select>
-        <button id="restorePick" type="button" class="primary" data-i18n="restore">恢复所选</button>
-      </div>
-      <div class="row">
-        <input id="snapName" type="text" placeholder="快照名字（可留空）" autocomplete="off">
-        <button id="snapMake" type="button" class="ghost" data-i18n="snapshot">新建快照</button>
-      </div>
-      <div class="row">
-        <label class="check">
+  <div class="body">
+    <aside class="side">
+      <section class="panel">
+        <h2 class="panel-title" data-i18n="settingsTitle">配置</h2>
+        <label class="switch">
           <input id="auto" type="checkbox">
-          <span data-i18n="autoRestore">发现匿名态时自动恢复</span>
+          <span class="track" aria-hidden="true"><span class="dot"></span></span>
+          <span class="switch-label" data-i18n="autoRestore">发现匿名态时自动恢复</span>
         </label>
-        <button id="restoreNow" type="button" class="ghost" data-i18n="restoreNow">立即恢复</button>
-      </div>
-      <ul id="log" class="log"></ul>
-    </section>
+        <label class="field">
+          <span class="field-label" data-i18n="gateway">magpie 网关</span>
+          <input id="gateway" type="text" autocomplete="off" spellcheck="false">
+        </label>
+        <div class="field">
+          <span class="field-label" data-i18n="intervalLabel">体检间隔</span>
+          <span class="field-static" id="interval">20 s</span>
+        </div>
+        <button id="saveSettings" type="button" class="primary wide" data-i18n="save">保存配置</button>
+        <p class="note tiny" data-i18n="optionHint">端口和 Codex 目录来自插件选项，改它们请在 magpie 里调整插件选项后重启 magpie。</p>
+      </section>
 
-    <section class="card" id="card-quota">
-      <h2 data-i18n="quotaTitle">codex 额度</h2>
-      <div id="quota"></div>
-    </section>
+      <section class="panel">
+        <h2 class="panel-title" data-i18n="pathsTitle">路径</h2>
+        <div class="path-row">
+          <span class="field-label" data-i18n="portLabel">服务端口</span>
+          <code id="pathPort">-</code>
+        </div>
+        <div class="path-row">
+          <span class="field-label" data-i18n="homeLabel">Codex 目录</span>
+          <code id="pathHome" class="wrap">-</code>
+          <button type="button" class="linkish" data-copy="home" data-i18n="copy">复制</button>
+        </div>
+        <div class="path-row">
+          <span class="field-label" data-i18n="backupLabel">备份目录</span>
+          <code id="pathBackup" class="wrap">-</code>
+          <button type="button" class="linkish" data-copy="backup" data-i18n="copy">复制</button>
+        </div>
+      </section>
 
-    <section class="card" id="card-routing">
-      <h2 data-i18n="routeTitle">路由现状</h2>
-      <div id="routing"></div>
-    </section>
-  </main>
+      <section class="panel soft">
+        <h2 class="panel-title" data-i18n="aboutTitle">说明</h2>
+        <p class="note tiny" data-i18n="aboutNote">Codex 把项目和会话归属写在 .codex-global-state.json 里，并按登录态分两份：登出时写的是没有项目的匿名版（连 .bak 一起），所以侧边栏看起来空了。会话本身从没被删。恢复只是把文件写回去。</p>
+      </section>
+    </aside>
 
-  <div id="toast" class="toast" hidden></div>
-  <script src="/ui/app.js"></script>
+    <main class="cards">
+
+      <section class="card span2" id="card-state">
+        <div class="card-head">
+          <h2 data-i18n="stateTitle">登录态</h2>
+          <div class="card-tools">
+            <button id="stateReload" type="button" class="ghost small" data-i18n="refresh">刷新</button>
+          </div>
+        </div>
+        <p id="stateNote" class="note"></p>
+        <div id="metrics" class="metrics"></div>
+        <dl id="stateList" class="kv"></dl>
+      </section>
+
+      <section class="card" id="card-snapshots">
+        <div class="card-head">
+          <h2 data-i18n="snapTitle">快照与恢复</h2>
+        </div>
+        <p class="note" data-i18n="snapNote">「补回项目」只把项目清单和会话归属写进去，其它设置一概不动；「整份还原」才会用快照覆盖整个文件。两者都会先把当前文件存进 pre-restore。</p>
+        <div class="row">
+          <select id="snapPick" aria-label="snapshot"></select>
+        </div>
+        <div class="row">
+          <button id="restorePick" type="button" class="primary" data-i18n="mergeRestore">补回项目（推荐）</button>
+          <button id="restoreFull" type="button" class="ghost" data-i18n="fullRestore">整份还原</button>
+        </div>
+        <p class="plan" id="planHint"></p>
+        <div class="row">
+          <input id="snapName" type="text" placeholder="快照名字（可留空）" autocomplete="off">
+          <button id="snapMake" type="button" class="ghost" data-i18n="snapshot">新建快照</button>
+        </div>
+        <div class="row">
+          <button id="restoreNow" type="button" class="ghost" data-i18n="restoreNow">立即恢复</button>
+          <button id="clearLog" type="button" class="ghost subtle" data-i18n="clearLog">清空日志</button>
+        </div>
+        <ul id="log" class="log"></ul>
+      </section>
+
+      <section class="card" id="card-quota">
+        <div class="card-head">
+          <h2 data-i18n="quotaTitle">codex 额度</h2>
+          <span class="card-tools"><span class="tag" id="quotaTag">-</span></span>
+        </div>
+        <div id="quota"></div>
+      </section>
+
+      <section class="card" id="card-providers">
+        <div class="card-head">
+          <h2 data-i18n="providersTitle">供应商</h2>
+          <span class="card-tools"><span class="tag" id="providersTag">-</span></span>
+        </div>
+        <p class="note" data-i18n="providersNote">这些是 magpie 里登记了额度的供应商与账号，codex 的窗口由上面那张卡片展开。</p>
+        <div id="providers"></div>
+      </section>
+
+      <section class="card" id="card-routing">
+        <div class="card-head">
+          <h2 data-i18n="routeTitle">路由现状</h2>
+          <span class="card-tools"><span class="tag" id="routingTag">-</span></span>
+        </div>
+        <div id="routing"></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+<script src="/ui/app.js"></script>
 </body>
 </html>

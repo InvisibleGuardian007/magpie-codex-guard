@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Codex 守护</title>
+  <title>会话守护 Session Guard</title>
   <style>
     :root { color-scheme: light dark; }
     html, body { height: 100%; margin: 0; }
@@ -16,19 +16,31 @@
     }
     .waiting {
       display: grid;
-      gap: 6px;
+      justify-items: center;
+      gap: 10px;
       max-width: 460px;
       padding: 0 20px;
       color: var(--magpie-muted, GrayText);
       text-align: center;
     }
+    .waiting svg { width: 44px; height: 44px; }
     .waiting b { color: var(--magpie-fg, CanvasText); font-size: 14px; font-weight: 600; }
-    .waiting button { justify-self: center; margin-top: 8px; padding: 5px 14px; font: inherit; }
+    .waiting b .en { margin-left: 6px; font-size: 12px; font-weight: 500; color: var(--magpie-muted, GrayText); }
+    .waiting button { margin-top: 4px; padding: 5px 14px; font: inherit; }
   </style>
 </head>
 <body>
   <div class="waiting">
-    <b id="title">Codex 守护</b>
+    <svg viewBox="0 0 128 128" aria-hidden="true">
+      <defs>
+        <linearGradient id="wg" x1="18" y1="12" x2="110" y2="118" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#4f8cff"/><stop offset="1" stop-color="#22c3b3"/>
+        </linearGradient>
+      </defs>
+      <path d="M64 8l44 17v40c0 27-18 47-44 55C38 112 20 92 20 65V25z" fill="url(#wg)"/>
+      <path d="M46 63l13 13 24-26" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <b id="title">会话守护 <span class="en">Session Guard</span></b>
     <div id="said">正在连接本地服务...</div>
     <button id="retry" type="button" hidden>重试</button>
   </div>

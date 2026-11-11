@@ -1,7 +1,7 @@
 {
   "name": "@magpie-community/page-codex-guard",
-  "version": "0.1.0",
-  "description": "在 magpie 窗口里加一个「Codex 守护」页面：体检 Codex 桌面端的登录态状态文件，随时快照与恢复被登出清空的项目与会话归属，显示 codex 账号的 5 小时 / 7 天额度与路由现状。A page in magpie's window that checks Codex's account-state file, snapshots and restores the project and session assignments a sign-out wipes, and shows the codex account's 5-hour and 7-day windows and the routing in effect.",
+  "version": "0.2.1",
+  "description": "在 magpie 窗口里加一个「会话守护」页面：盯住 Codex 桌面端的登录态文件，随时快照与还原被登出清空的项目与会话归属，同时显示 codex 账号的 5 小时 / 7 天额度、各家供应商与当前路由。A page in magpie's window that watches Codex's account-state file, snapshots and restores the projects and session assignments a sign-out wipes, and shows the codex windows, every provider and the routing in effect.",
   "type": "module",
   "main": "./index.mjs",
   "files": [
@@ -29,7 +29,8 @@
     "codex",
     "codex-desktop",
     "backup",
-    "quota"
+    "quota",
+    "providers"
   ],
   "license": "MIT",
   "author": "InvisibleGuardian007",
@@ -42,19 +43,19 @@
     "url": "https://github.com/InvisibleGuardian007/magpie-codex-guard/issues"
   },
   "magpie": {
-    "name": "Codex 守护 / Codex guard",
+    "name": "会话守护 Session Guard",
     "summary": {
-      "en": "Codex desktop keeps its projects and session assignments in .codex/.codex-global-state.json, keyed by the signed-in account: a sign-out rewrites it as an anonymous copy with no projects, so the sidebar shows nothing. This page classifies that file, snapshots it, restores it (optionally by itself, every 20 seconds), and shows the codex account's 5-hour and 7-day windows plus the routing in effect.",
-      "zh": "Codex 桌面端把项目和会话归属存在 .codex/.codex-global-state.json，并按登录态分版本：一登出就被改写成没有项目的匿名版，侧边栏于是空掉。这个页面判断该文件的状态、快照与恢复（可选每 20 秒自动恢复），并显示 codex 账号的 5 小时 / 7 天额度和当前路由。"
+      "en": "Codex desktop keeps its projects and session assignments in .codex/.codex-global-state.json, keyed by the signed-in account: a sign-out rewrites it as an anonymous copy with no projects, so the sidebar shows nothing. This page classifies that file, snapshots it, restores it (optionally by itself, every 20 seconds), and shows the codex account's 5-hour and 7-day windows, every provider's accounts and windows, and the routing in effect.",
+      "zh": "Codex 桌面端把项目和会话归属存在 .codex/.codex-global-state.json，并按登录态分版本：一登出就被改写成没有项目的匿名版，侧边栏于是空掉。这个页面判断该文件的状态、快照与恢复（可选每 20 秒自动恢复），显示 codex 账号的 5 小时 / 7 天额度、各家供应商的账号与窗口，以及当前生效的路由。"
     },
-    "icon": "",
+    "icon": "page/icon.svg",
     "page": {
-      "title": "Codex 守护",
+      "title": "会话守护 Session Guard",
       "titles": {
-        "en": "Codex guard",
-        "zh": "Codex 守护",
-        "zh-TW": "Codex 守護",
-        "ja": "Codex ガード"
+        "en": "Session Guard",
+        "zh": "会话守护 Session Guard",
+        "zh-TW": "會話守護 Session Guard",
+        "ja": "セッションガード Session Guard"
       },
       "file": "page/index.html",
       "icon": "page/icon.svg",
